@@ -100,3 +100,36 @@ class Solution:
 ```
 
 标的是中等，觉得应该划到简单里。
+
+---
+
+## [22. 括号生成](https://leetcode.cn/problems/generate-parentheses/)
+
+数字 `n` 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 **有效的** 括号组合。
+
+```python
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+        res = []
+        # 回溯递归，参数是目前搜索的列表（比起字符串增减容易），左右括号的个数
+        def search(_res, left, right):
+            # 终止条件，当前列表长度为2倍的n，添加到结果列表中
+            if len(_res) == 2*n:
+                res.append(''.join(_res))
+                return
+            # 保证终止条件中的组合是正确的关键，左括号数在进入下一层递归时小于一半的长度，这样下层递归就会刚好为n个左括号（最后的左括号递归那层）并进入右括号判断
+            if left < n:
+                _res.append('(')
+                search(_res, left+1, right)
+                _res.pop()
+            # 关键其二，一定在右括号数量少于左括号的时候才添加
+            if right < left:
+                _res.append(')')
+                search(_res, left, right+1)
+                _res.pop()
+        #起始的搜索条件，搜索状态空，左右括号为0
+        search([], 0, 0)
+        return res
+```
+
+十分讨厌的，并不擅长的，关于字符串排列的题，还是括号这种需要匹配机制的题；不在状态的时候很难思考出一个好方法，看看题解发现这题一年前做过一遍，而且看题解理解起来比自己纯想容易的多。看到所有排列想到回溯，但是如何添加括号是个问题。和平常的回溯不大一样，有两处搜索，左括号添加与弹出，右括号添加与弹出，保证正确性的做法是控制数量和保证左右括号的顺序性（先左后右）。总而言之，需要再多做做回溯题保证思考清晰。
