@@ -274,3 +274,103 @@ class Solution:
 
 1. 根本想不到每个字符串都可以由空串拼接而成，只要空串值为0，相邻的平衡括号字符串只会相加不影响结果，顺着这个思路可能可以想到在最左侧（栈底）添加一个0；不添加0，最后一步stack会弹出所有元素。
 2. else内的操作也很讲究，首先弹出配对的左括号到该右括号区间的值，括号就是这样，永远都配对。如果不为空串说明中间已经计算过了空串的值了，`()` 这种空串情况一定存在并被计算了；乘2之后加到左侧栈顶，很巧妙，因为有0这个值的存在，所以如果是外层括号内部的最左侧括号，那么左侧栈顶这个值会为0，之后结果会不断累加；按照这个逻辑，直到最后所有括号被计算，这个值会和最开始赋值的栈底值0相加求和，得出最后的结果。
+
+---
+
+### [1684. 统计一致字符串的数目](https://leetcode.cn/problems/count-the-number-of-consistent-strings/)
+
+给你一个由不同字符组成的字符串 `allowed` 和一个字符串数组 `words` 。如果一个字符串的每一个字符都在 `allowed` 中，就称这个字符串是 **一致字符串**。请你返回 `words` 数组中 **一致字符串** 的数目。
+
+```python
+class Solution:
+    def countConsistentStrings(self, allowed: str, words: List[str]) -> int:
+        res = 0
+        for word in words:
+            for c in word:
+                if c not in allowed: 
+                    break
+            else:
+                res += 1
+        return res
+```
+
+没什么注释，简单题，但是看到题解有人提到了 `for...else` 语法，所以记录一下。
+
+---
+
+### [1620. 网络信号最好的坐标](https://leetcode.cn/problems/coordinate-with-maximum-network-quality/)
+
+给你一个数组 `towers` 和一个整数 `radius` 。
+
+数组 `towers` 中包含一些网络信号塔，其中 `towers[i] = [xi, yi, qi]` 表示第 `i` 个网络信号塔的坐标是 `(xi, yi)` 且信号强度参数为 `qi` 。所有坐标都是在 X-Y 坐标系内的 **整数** 坐标。两个坐标之间的距离用 **欧几里得距离** 计算。
+
+整数 `radius` 表示一个塔 **能到达** 的 **最远距离** 。如果一个坐标跟塔的距离在 `radius` 以内，那么该塔的信号可以到达该坐标。在这个范围以外信号会很微弱，所以 `radius` 以外的距离该塔是 **不能到达的** 。
+
+如果第 `i` 个塔能到达 `(x, y)` ，那么该塔在此处的信号为 `⌊qi / (1 + d)⌋` ，其中 `d` 是塔跟此坐标的距离。一个坐标的 **信号强度** 是所有 **能到达** 该坐标的塔的信号强度之和。
+
+请你返回数组 `[cx, cy]` ，表示 **信号强度** 最大的 **整数** 坐标点 `(cx, cy)` 。如果有多个坐标网络信号一样大，请你返回字典序最小的 **非负** 坐标。
+
+```python
+class Solution:
+    def bestCoordinate(self, towers: List[List[int]], radius: int) -> List[int]:
+        # 求最大范围，题目中指出所有坐标都在0到50的范围内，所以也可以不求
+        max_x = max([tower[0] for tower in towers])
+        max_y = max([tower[1] for tower in towers])
+        res = []
+        strength = -1
+		
+        # 题目要求字典序最小的非负坐标，因此从左至右从下至上搜索
+        for i in range(max_x+1):
+            for j in range(max_y+1):
+                # 强度总和初始化
+                _strength = 0
+                for x,y,q in towers:
+                    distance = math.sqrt(abs(i-x)**2 + abs(j-y)**2)
+                    # 注意信号范围超过了就忽略该信号
+                    if distance <= radius:
+                        _strength += math.floor(q / (1+distance))
+                if _strength > strength:
+                    res = [i, j]
+                    strength = _strength
+        
+        return res
+```
+
+注意概念**欧几里得距离**指最普通的距离，还有其他的距离例如**曼哈顿距离**是直接求坐标差绝对值之和等等；另外，可以证明不需要搜索类似于max_x+radius这种搜索范围，因为总能找到一个字典序更小的坐标，这个坐标的强度大于或等于范围外的这些点；此外还要注意求最大值的这个列表的使用，别忘记了。
+
+---
+
+### [790. 多米诺和托米诺平铺](https://leetcode.cn/problems/domino-and-tromino-tiling/)
+
+有两种形状的瓷砖：一种是 `2 x 1` 的多米诺形，另一种是形如 "L" 的托米诺形。两种形状都可以旋转。
+
+![img](https://assets.leetcode.com/uploads/2021/07/15/lc-domino.jpg)
+
+给定整数 n ，返回可以平铺 `2 x n` 的面板的方法的数量。**返回对** `109 + 7` **取模** 的值。
+
+平铺指的是每个正方形都必须有瓷砖覆盖。两个平铺不同，当且仅当面板上有四个方向上的相邻单元中的两个，使得恰好有一个平铺有一个瓷砖占据两个正方形。
+
+```python
+class Solution:
+    def numTilings(self, n: int) -> int:
+        # 初始化dp列表，第二个维度代表第i列的瓷砖分布情况，0全空，1上方有瓷砖，2下方有瓷砖，3瓷砖铺满第i列，这些状态分别从前一列（i-1）列的不同状态转移
+        dp = [[0]*4 for i in range(n)]
+        # 只有全空和全铺满的情况会出现在第一列
+        dp[0][3] = 1
+        dp[0][0] = 1
+        # 状态转移，看解析比较好
+        for i in range(1, n):
+            dp[i][0] = dp[i-1][3]
+            dp[i][1] = dp[i-1][2] + dp[i-1][0]
+            dp[i][2] = dp[i-1][1] + dp[i-1][0]
+            dp[i][3] = dp[i-1][0] + dp[i-1][1] + dp[i-1][2] + dp[i-1][3]
+        # 返回最后一列铺满时的总数，并且注意取模
+        return dp[-1][3] % (10**9+7)
+```
+
+根本看不懂题目描述的最后一句，但是这是一道非常经典的题（听别人说的）。解法还能用其他找规律的思路，或者矩阵快速幂，这个改天脑子比较清楚的时候再看。动态规划的话，可以参考下面这个图：
+
+![img](https://assets.leetcode-cn.com/solution-static/790/1.png)
+
+偷的图，总而言之转移方式就这样，唯一令我不解的是最后一种 `dp[i-1][0] -> dp[i][3] ` 还有一种重复的，就是两个多米诺竖着插入，但是这个状态和最后一种是重复的，所以被忽略了？如果之后再出现这种状态重复的情况再来看吧。最后，有意思的是这些形状还有其他版本的，比如四格骨牌：[Tetromino](https://en.wikipedia.org/wiki/Tetromino)，很神秘的俄罗斯方块形状。
+
