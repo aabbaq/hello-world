@@ -374,3 +374,45 @@ class Solution:
 
 偷的图，总而言之转移方式就这样，唯一令我不解的是最后一种 `dp[i-1][0] -> dp[i][3] ` 还有一种重复的，就是两个多米诺竖着插入，但是这个状态和最后一种是重复的，所以被忽略了？如果之后再出现这种状态重复的情况再来看吧。最后，有意思的是这些形状还有其他版本的，比如四格骨牌：[Tetromino](https://en.wikipedia.org/wiki/Tetromino)，很神秘的俄罗斯方块形状。
 
+---
+
+### [791. 自定义字符串排序](https://leetcode.cn/problems/custom-sort-string/)
+
+给定两个字符串 `order` 和 `s` 。`order` 的所有单词都是 **唯一** 的，并且以前按照一些自定义的顺序排序。
+
+对 `s` 的字符进行置换，使其与排序的 `order` 相匹配。更具体地说，如果在 `order` 中的字符 `x` 出现字符 `y` 之前，那么在排列后的字符串中， `x` 也应该出现在 `y` 之前。
+
+返回 *满足这个性质的 `s` 的任意排列* 。
+
+```python
+class Solution:
+    def customSortString(self, order: str, s: str) -> str:
+        # 对字符串计数
+        counter = collections.Counter(s)
+        res = []
+        # 按顺序检查字符串s是否含有顺序的字符，如果有直接插入相应个数的字符串
+        for c in order:
+            if c in counter.keys():
+                res.append(c * counter[c])
+                counter[c] = 0
+		# 检查剩下的不需要顺序的字符串，并插入
+        for key, count in counter.items():
+            if count != 0:
+                res.append(key * count)
+        return ''.join(res)
+```
+
+虽然是自己写的方法，但是思路是**计数排序**法，我并没有注意到这点。另外，Python需要掌握的是 `sorted()` 的使用方法，因此再给出另一种直接排序的解法：
+
+```python
+class Solution:
+    def customSortString(self, order: str, s: str) -> str:
+        # 字典，默认值为0
+        d = collections.defaultdict(int)
+        # 按权重从小到大排序，注意i需要从1开始，因为不排序的字符权重默认为0
+        for i, c in enumerate(order):
+            d[c] = i + 1
+        # 排序，需要注意的是这里的排序，所有不在排序规则内的字符会在结果字符串前面
+        return ''.join(sorted(s, key=lambda x: d[x]))
+```
+
