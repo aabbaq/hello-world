@@ -430,14 +430,14 @@ class Solution:
         n = len(nums)
         _sum = sum(nums)
         target = _sum // 2
-		# 如果和为奇数，证明不能等分
+        # 如果和为奇数，证明不能等分
         if target * 2 != _sum: return False
-		# 设置背包dp，row表示数字的选取与否，col表示选取值的和
+        # 设置背包dp，row表示数字的选取与否，col表示选取值的和
         dp = [[False] * (target+1) for _ in range(n)]
-		# 初始化，每个数字不选的时候，和为0都成立
+        # 初始化，每个数字不选的时候，和为0都成立
         for i in range(n):
             dp[i][0] = True
-		# dp填充过程，从下至上，从左至右
+        # dp填充过程，从下至上，从左至右
         for i in range(1, n):
             for j in range(1, target+1):
                 # dp转移方程
