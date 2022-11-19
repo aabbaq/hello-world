@@ -193,7 +193,7 @@ class Solution:
 
 ---
 
-### [764. 最大加号标志](https://leetcode.cn/problems/largest-plus-sign/)
+## [764. 最大加号标志](https://leetcode.cn/problems/largest-plus-sign/)
 
 在一个 `n x n` 的矩阵 `grid` 中，除了在数组 `mines` 中给出的元素为 `0`，其他每个元素都为 `1`。`mines[i] = [xi, yi]`表示 `grid[xi][yi] == 0`
 
@@ -244,7 +244,7 @@ class Solution:
 
 ---
 
-### [856. 括号的分数](https://leetcode.cn/problems/score-of-parentheses/)
+## [856. 括号的分数](https://leetcode.cn/problems/score-of-parentheses/)
 
 给定一个平衡括号字符串 `S`，按下述规则计算该字符串的分数：
 
@@ -277,7 +277,7 @@ class Solution:
 
 ---
 
-### [1684. 统计一致字符串的数目](https://leetcode.cn/problems/count-the-number-of-consistent-strings/)
+## [1684. 统计一致字符串的数目](https://leetcode.cn/problems/count-the-number-of-consistent-strings/)
 
 给你一个由不同字符组成的字符串 `allowed` 和一个字符串数组 `words` 。如果一个字符串的每一个字符都在 `allowed` 中，就称这个字符串是 **一致字符串**。请你返回 `words` 数组中 **一致字符串** 的数目。
 
@@ -298,7 +298,7 @@ class Solution:
 
 ---
 
-### [1620. 网络信号最好的坐标](https://leetcode.cn/problems/coordinate-with-maximum-network-quality/)
+## [1620. 网络信号最好的坐标](https://leetcode.cn/problems/coordinate-with-maximum-network-quality/)
 
 给你一个数组 `towers` 和一个整数 `radius` 。
 
@@ -340,7 +340,7 @@ class Solution:
 
 ---
 
-### [790. 多米诺和托米诺平铺](https://leetcode.cn/problems/domino-and-tromino-tiling/)
+## [790. 多米诺和托米诺平铺](https://leetcode.cn/problems/domino-and-tromino-tiling/)
 
 有两种形状的瓷砖：一种是 `2 x 1` 的多米诺形，另一种是形如 "L" 的托米诺形。两种形状都可以旋转。
 
@@ -376,7 +376,7 @@ class Solution:
 
 ---
 
-### [791. 自定义字符串排序](https://leetcode.cn/problems/custom-sort-string/)
+## [791. 自定义字符串排序](https://leetcode.cn/problems/custom-sort-string/)
 
 给定两个字符串 `order` 和 `s` 。`order` 的所有单词都是 **唯一** 的，并且以前按照一些自定义的顺序排序。
 
@@ -416,3 +416,187 @@ class Solution:
         return ''.join(sorted(s, key=lambda x: d[x]))
 ```
 
+---
+
+## [416. 分割等和子集](https://leetcode.cn/problems/partition-equal-subset-sum/)
+
+给你一个 **只包含正整数** 的 **非空** 数组 `nums` 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+
+```python
+class Solution:
+    def canPartition(self, nums: List[int]) -> bool:
+        # 排序，做特殊判断的初始化
+        nums.sort()
+        n = len(nums)
+        _sum = sum(nums)
+        target = _sum // 2
+		# 如果和为奇数，证明不能等分
+        if target * 2 != _sum: return False
+		# 设置背包dp，row表示数字的选取与否，col表示选取值的和
+        dp = [[False] * (target+1) for _ in range(n)]
+		# 初始化，每个数字不选的时候，和为0都成立
+        for i in range(n):
+            dp[i][0] = True
+		# dp填充过程，从下至上，从左至右
+        for i in range(1, n):
+            for j in range(1, target+1):
+                # dp转移方程
+                if nums[i] <= j:
+                    dp[i][j] = dp[i-1][j-nums[i]] or dp[i-1][j]
+                else:
+                    dp[i][j] = dp[i-1][j]
+        # 返回选择在可选所有物品条件下和为target值的真假
+        return dp[-1][-1]
+```
+
+这道题需要把原有问题转化为一个0-1背包问题，只要选取部分数字达到全部数字和的一半，那么剩下一半数字必定能分成相同和的一组；dp内的值为布尔值，用来直接判断在选取数字 `num[:i+1]`的情况下是否能组成一个和 `j` ，转移方程的含义如下：
+
+1. 如果当前数字小于（或等于）目标和 `j`，这里我可以选择是否添加该数字 `i`，这个选择取决于上一层状态，我是否能组成和 `j-i`，如果可以，那么此时从之前状态选择 `i` 组成目标和 `j` 转移到当前状态，` dp[i][j]` 为真。另一种情况下，是当前和与目标和相同，已经为 `j`，那么此时不选则数字也可以设置当前 ` dp[i][j]` 为真；
+2. 如果当前数字大于目标和 `j` ，那么该数字不可选，只能看上一层状态的和是否可以为 `j` ；
+
+---
+
+## [474. 一和零](https://leetcode.cn/problems/ones-and-zeroes/)
+
+给你一个二进制字符串数组 `strs` 和两个整数 `m` 和 `n` 。
+
+请你找出并返回 `strs` 的最大子集的长度，该子集中 **最多** 有 `m` 个 `0` 和 `n` 个 `1`。
+
+如果 `x` 的所有元素也是 `y` 的元素，集合 `x` 是集合 `y` 的 **子集** 。
+
+```python
+class Solution:
+    def findMaxForm(self, strs: List[str], m: int, n: int) -> int:
+        # 定义三维dp列表dp[i]表示选取前0个0-1字符串的最大子集长度
+        l = len(strs)
+        dp = [[[0] * (n+1) for _ in range(m+1)] for _ in range(l+1)]
+		# 从第二行i=1开始，表示选择第一个0-1字符串
+        for i in range(1, l+1):
+            # 求0,1的个数
+            c0 = strs[i-1].count('0')
+            c1 = strs[i-1].count('1')
+            # 注意这里必须从0开始，因为对0,1的计量是组合形式的，和二维不同
+            for j in range(m+1):
+                for k in range(n+1):
+                    # 如果不能添加字符串（这里也是组合形式，0,1都必须在j,k范围内）
+                    if j < c0 or k < c1:
+                        dp[i][j][k] = dp[i-1][j][k]
+                    # 可以添加字符串，就看添加过后长度大一些还是不添加时大一些
+                    else:
+                        dp[i][j][k] = max(dp[i-1][j][k], dp[i-1][j-c0][k-c1] + 1)
+
+        return dp[-1][-1][-1]
+```
+
+总而言之，是0-1背包的三维形式，`dp[i][j][k]` 代表了选择前i个字符串的情况下，`0，1`个数分别为 `j，k` 时所能得到的最大子集长度为多少，需要注意的两点：
+
+1. 如果设定row（物品数，在这里是字符串数组的长度）+1，那么可以正常遍历，如果不设置+1，需要手动初始化第一行（第一个字符串的情况），dp的初始化看个人喜好吧；
+2. 关于0,1个数的维度范围，需要从0开始，因为有的字符串可能只含0或1，而遍历时需要遍历到j=0，k=0...n或者k=0, j=0...m的情况，不从0开始会错过很多状态，这也是和二维不同的地方，需要注意；同理，**不能添加**的时候只需满足1个数太多或者0个数太多两个条件的**其中之一**；
+
+---
+
+## [494. 目标和](https://leetcode.cn/problems/target-sum/)
+
+给你一个整数数组 `nums` 和一个整数 `target` 。
+
+向数组中的每个整数前添加 `'+'` 或 `'-'` ，然后串联起所有整数，可以构造一个 **表达式** ：
+
+- 例如，`nums = [2, 1]` ，可以在 `2` 之前添加 `'+'` ，在 `1` 之前添加 `'-'` ，然后串联起来得到表达式 `"+2-1"` 。
+
+返回可以通过上述方法构造的、运算结果等于 `target` 的不同 **表达式** 的数目。
+
+```python
+class Solution:
+    def findTargetSumWays(self, nums: List[int], target: int) -> int:
+        n = len(nums)
+        # 特判，只有一个元素的时候，该元素必须等于-target或target
+        if n == 1:
+            if nums[0] == target or nums[0] == -target:
+                return 1
+            else:
+                return 0
+        
+        # 找出pos的和应该为多少
+        pos2 = target + sum(nums)
+        pos = pos2 >> 1
+        # 不能被2整除，所以无解
+        if pos << 1 != pos2: return 0
+
+        # dp初始化，和前几个背包问题一样
+        dp = [[0] * (pos+1) for _ in range(n)]    
+        for i in range(n):
+            dp[i][0] = 1
+        # 注意特例，当nums第一个元素为0的时候，需要赋值为2，因为+0-0都为0，但是其他人的解没有这项
+        # 这里代码可能会有些迷惑，这里不仅设置了特殊值nums[0]为0，还初始化了第一行
+        dp[0][nums[0]] = 2 if nums[0] == 0 else 1
+
+        # 稍微有所不同，j从0开始遍历，因为物品中（数字）可能存在0
+        for i in range(1, n):
+            for j in range(pos+1):
+                # 不能选择数字的情况
+                if j < nums[i]:
+                    dp[i][j] = dp[i-1][j]
+                # 求的是不同种类的组合数，所以状态转移为加法
+                else:
+                    dp[i][j] = dp[i-1][j] + dp[i-1][j-nums[i]]
+
+        return dp[-1][-1]
+```
+
+直接照搬之前的解法，发现自己写的注释还是很迷惑，重新梳理了一下，首先根据公式：
+
+$$
+pos + neg = sum \\
+pos = target + neg \\
+pos = {{target + sum}\over 2}
+$$
+转化问题为一个0-1背包问题，目标就是选取一些数字，让它们的和成为 `pos` 部分，依旧包含特例，比如只有一个数字可选的情况；
+
+初始化这里也在注释中写了，这里可能会有疑问，为什么 `dp[i][j]` 中的j一定是非负的，target可能是负的啊？因为abs(target)肯定小于sum，不然公式不成立，而sum一定是非负数，因此dp是正确的。初始化第一行的时候考虑第一个数字为0的情况，因此对应的和位置需要初始化为2，其他数字为1。当然根据之前的dp理论，可以选择不同的初始化方法，比如让row+1。又因为该背包物品重量可能为0，因此不能简单的不考虑 `j=0`的情况。
+
+---
+
+## [1049. 最后一块石头的重量 II](https://leetcode.cn/problems/last-stone-weight-ii/)
+
+有一堆石头，用整数数组 `stones` 表示。其中 `stones[i]` 表示第 `i` 块石头的重量。
+
+每一回合，从中选出**任意两块石头**，然后将它们一起粉碎。假设石头的重量分别为 `x` 和 `y`，且 `x <= y`。那么粉碎的可能结果如下：
+
+- 如果 `x == y`，那么两块石头都会被完全粉碎；
+- 如果 `x != y`，那么重量为 `x` 的石头将会完全粉碎，而重量为 `y` 的石头新重量为 `y-x`。
+
+最后，**最多只会剩下一块** 石头。返回此石头 **最小的可能重量** 。如果没有石头剩下，就返回 `0`。
+
+```python
+class Solution:
+    def lastStoneWeightII(self, stones: List[int]) -> int:
+        _sum = sum(stones)
+        n = len(stones)
+        # 特殊值的判断，仅有一颗石头，就返回石头重量
+        if n == 1: return stones[0]
+    	# 也可以写成 target = _sum // 2, 总之，接近均值即可
+        target = ceil(_sum / 2)
+		
+        dp = [[False] * (target+1) for _ in range(n)]
+		# 经典初始化，第一列都可以凑出（不选）
+        for i in range(n):
+            dp[i][0] = True
+        # 第一行初始化，第一块石头选择的情况下凑出重量stone[0]
+        dp[0][stones[0]] = True
+		# 填充dp
+        for i in range(1, n):
+            for j in range(1, target+1):
+                if stones[i] > j:
+                    dp[i][j] = dp[i-1][j]
+                else:
+                    dp[i][j] = dp[i-1][j] or dp[i-1][j-stones[i]]
+        
+		# 特殊的解法，找到最后一行，即所有石头均可选择的情况下，最接近均值的重量是多少（从右到左）
+        for i in range(target, -1, -1):
+            if dp[-1][i]:
+                # 找到该重量后，进行计算
+                # 如果之前的target选择的是_sum//2, 那么此处直接_sum - i*2即可
+                return abs(i - (_sum-i)) 
+```
+
+和之前的思路相通，问题转化为0-1背包问题，即把石头分为两堆，使这两堆石头重量尽可能相同，区别是，这里组成的重量和不确定，可以为一半也可以不为，总之，选择的是最接近一半的重量和最为目标即可；很多题解中使用的是向下取整的target，这是经过了公式推导的。但这里其实也能使用直接的逻辑选择向上取整，只不过最后求值的时候需要做一些处理；同理初始化也可以根据自己喜好选择不同的初始化方式。
