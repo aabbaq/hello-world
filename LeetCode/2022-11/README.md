@@ -600,3 +600,55 @@ class Solution:
 ```
 
 和之前的思路相通，问题转化为0-1背包问题，即把石头分为两堆，使这两堆石头重量尽可能相同，区别是，这里组成的重量和不确定，可以为一半也可以不为，总之，选择的是最接近一半的重量和最为目标即可；很多题解中使用的是向下取整的target，这是经过了公式推导的。但这里其实也能使用直接的逻辑选择向上取整，只不过最后求值的时候需要做一些处理；同理初始化也可以根据自己喜好选择不同的初始化方式。
+
+---
+
+## [110. 平衡二叉树](https://leetcode.cn/problems/balanced-binary-tree/)
+
+给定一个二叉树，判断它是否是高度平衡的二叉树。
+
+本题中，一棵高度平衡二叉树定义为：
+
+> 一个二叉树*每个节点* 的左右两个子树的高度差的绝对值不超过 1 。
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public boolean isBalanced(TreeNode root) {
+        // height为-1时代表不平衡，0是特例，root为null的情况
+        return height(root) >= 0; 
+    }
+
+    public int height(TreeNode root) {
+        // 递归时，如果为空则返回高度0
+        if (root == null) {
+            return 0;
+        }
+        int leftHeight = height(root.left);
+        int rightHeight = height(root.right);
+        // 注意，左右子树中任一子树为不平衡时 或 该节点不平衡都返回-1
+        if (leftHeight == -1 | rightHeight == -1 || Math.abs(leftHeight - rightHeight) > 1) {
+            return -1;
+        // 否则，返回高度
+        } else {
+            return Math.max(leftHeight, rightHeight) + 1;
+        }
+    }
+}
+```
+
+不会Java，所以简单题多写一些Java代码

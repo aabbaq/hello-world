@@ -231,3 +231,203 @@ drwxr-xr-x 3 root root  26 Mar  6  2022 kp
 
 ---
 
+- `grep`：过滤查找
+  - `grep -n CONTENT FILE`：在文件查找指定内容，并显示行号
+- `wc`：统计词频
+  - `wc FILE`：对指定文件进行统计词频，第一个参数为行数，第二个为单词数量，第三个为文件大小
+- `|`：管道符，连续处理多个命令，将前一个命令输出作为后一个命令的输入
+  - `grep -n CONTENT FILE | wc`：对指定内容进行词频统计
+
+
+
+## 压缩解压命令
+
+- `gzip FILE`：压缩一个文件，得到一个 `.gz` 压缩文件
+  - 不保留原文件
+  - 不能压缩目录
+- `gupzip GZ_FILE`：解压一个 `.gz` 压缩文件
+
+- `zip FILE`：压缩一个指定的文件
+  - `zip -r DIRECTORY`：压缩目录
+  - `zip -d DIRECTORY TARGET`：将指定目标压缩至指定目录
+- `unzip FILE`：解压一个指定的压缩包
+  - `unzip -d DIRECTORY TARGET`：将指定压缩文件解压至指定目录
+- `tar [option] TARGET`：打包或解包
+  - `tar -c`：产生 `.tar` 打包文件
+  - `tar -z`：打包的同时压缩
+  - `tar -x`：解包 `.tar` 文件
+  - `tar -f`：指定压缩后的文件名
+  - `tar -C`：解压到指定目录
+  - `TARGET`：命名需要命名为`.tar.gz` 文件
+
+
+
+## 磁盘命令
+
+- `du`：查看目录容量大小
+  - `du DIRECTORY`：查看指定目录大小
+  - `du -h`：显示易于观看的大小
+  - `du -a`：包括文件统计大小
+  - `du -c`：统计总用量（好像没啥用）
+  - `du -s`：只统计当前总量
+  - `du --max-depth=N`：指定统计的深度（子目录）
+
+- `df`：查看磁盘占用情况
+
+  - `df -h`：显示易于观看的占用情况
+
+- `free`：查看内存占用情况
+
+  - `free -h`：显示易于观看的占用情况
+
+- `lsbrl`：查看块设备的挂载情况：
+
+  ```bash
+  NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+  vda    253:0    0  60G  0 disk
+  └─vda1 253:1    0  60G  0 part /
+  ```
+
+  表示一个磁盘和一个分区，`vda` 表示虚拟硬盘（云服务器），其中的 `a` 代表第一块硬盘
+
+  - `lsbrl -f`：显示磁盘的文件系统信息：
+
+    ```bash
+    NAME   FSTYPE LABEL UUID                                 MOUNTPOINT
+    vda
+    └─vda1 xfs          edf839fd-8e1a-4373-946a-c32c9b459611 /
+    ```
+
+---
+
+- `mount`：挂载一个设备
+  - `mount [-t vfstype] [-o options] DEVICE DIRECTORY`：挂载指定设备至指定目录
+
+- `umount`：卸载一个设备
+  - `mount DEVICE`：卸载一个设备，可以指定设备文件或挂载点
+
+- `/etc/fstab`：配置设备挂载选项的配置文件
+
+---
+
+- `fdisk`：新磁盘的分区操作，在 `root` 权限下使用
+  - `fdisk -l`：查看磁盘分区详情
+  - `fdisk DEVICE`：为指定硬盘进行分区
+
+- `mkfs -t TYPE DEVICE`：为指定磁盘格式化为指定类型
+
+
+
+## 进程命令
+
+- `ps`：查看进程状态（只显示用户相关的进程）
+  - `ps aux`：查看系统中所有进程，一般与 `| grep OPTION` 配合使用，用于查看系统占用率
+    - `ps a`：所有带有终端的所有用户的进程
+    - `ps x`：所有当前用户的所有进程，包括没有终端的进程
+    - `ps u`：用户友好的显示风格
+  - `ps -ef`：查看系统中所有进程，包含 `pid` 与 `ppid`，用于查看父子进程关系
+    - `ps -e`：显示所有进程
+    - `ps -u`：显示与某用户相关的所有进程
+    - `ps -f`：显示详细信息
+
+**显示的信息**
+
+```bash
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.5 172692  9076 ?        Ss   Mar06   3:28 /usr/lib/systemd/systemd --system --deserialize 21
+root           2  0.0  0.0      0     0 ?        S    Mar06   0:04 [kthreadd]
+root           3  0.0  0.0      0     0 ?        I<   Mar06   0:00 [rcu_gp]
+root           4  0.0  0.0      0     0 ?        I<   Mar06   0:00 [rcu_par_gp]
+root           6  0.0  0.0      0     0 ?        I<   Mar06   0:00 [kworker/0:0H-kblockd]
+root           9  0.0  0.0      0     0 ?        I<   Mar06   0:00 [mm_percpu_wq]
+root          10  0.0  0.0      0     0 ?        S    Mar06   0:04 [ksoftirqd/0]
+root          11  0.0  0.0      0     0 ?        I    Mar06  39:29 [rcu_sched]
+root          12  0.0  0.0      0     0 ?        S    Mar06   0:00 [migration/0]
+root          13  0.0  0.0      0     0 ?        S    Mar06   0:00 [watchdog/0]
+root          14  0.0  0.0      0     0 ?        S    Mar06   0:00 [cpuhp/0]
+root          15  0.0  0.0      0     0 ?        S    Mar06   0:00 [cpuhp/1]
+root          16  0.0  0.0      0     0 ?        S    Mar06   0:14 [watchdog/1]
+root          17  0.0  0.0      0     0 ?        S    Mar06   0:00 [migration/1]
+root          18  0.0  0.0      0     0 ?        S    Mar06   0:05 [ksoftirqd/1]
+root          20  0.0  0.0      0     0 ?        I<   Mar06   0:00 [kworker/1:0H-kblockd]
+root          23  0.0  0.0      0     0 ?        S    Mar06   0:00 [kdevtmpfs]
+root          24  0.0  0.0      0     0 ?        I<   Mar06   0:00 [netns]
+root          25  0.0  0.0      0     0 ?        S    Mar06   0:12 [kauditd]
+root          26  0.0  0.0      0     0 ?        S    Mar06   0:04 [khungtaskd]
+root          27  0.0  0.0      0     0 ?        S    Mar06   0:00 [oom_reaper]
+root          28  0.0  0.0      0     0 ?        I<   Mar06   0:00 [writeback]
+```
+
+1. `PID`：进程ID号
+
+2. `%CPU`：占用CPU
+3. `%MEM`：占用内存
+4. `VSZ`：占用虚拟内存大小
+5. `RSS`：占用物理内存大小
+6. `TTY`：进程所在终端，`?` 指没有终端
+7. `STAT`：进程状态
+   - `R`：运行状态
+   - `S`：睡眠状态
+   - `T`：暂停状态
+   - `Z`：僵尸进程
+   - `s`：包含了子进程
+   - `l`：多线程进程
+   - `+`：前台显示
+   - `<`：进程优先级高
+   - `N`：进程优先级低
+
+8. `START`：进程启动时间（日期）
+9. `TIME`：占用CPU使用的时间
+10. `COMMAND`：产生此进程的命令名
+
+11. `PPID`：父进程ID号
+
+---
+
+- `kill PID`：终止进程
+  - `killall P_NAME`：终止所有指定的进程
+  - `kill -9 PID`：强制终止进程
+
+- `pstree`：显示进程间层级关系
+  - `pstree -p`：追加显示进程PID信息
+  - `pstree -u`：追加显示进程用户名信息
+
+- `top`：动态显示进程状态（实时）
+  - `top -d SECONDS`：设定显示刷新时间间隔
+  - `top -i`：不显示闲置进程
+  - `top -p PID`：监控指定进程
+  - CPU参数信息：
+    - `us`：用户进程占用
+    - `sy`：系统进程占用
+    - `ni`：nice进程占用
+    - `id`：就绪进程占用
+    - `wa`：等待I/O进程占用
+    - `hi`：硬中断占用
+    - `si`：软中断占用
+    - `st`：stolen占用
+  - `shift` + `m`：按照内存使用情况排序
+  - `shift` + `p`：按照CPU使用情况排序
+  - `shift` + `n`：按照进程号排序
+  - `k`：直接终止指定PID的进程
+
+
+
+## 网络命令
+
+- `netstat`：显示网络状态和端口占用信息
+- `netstat -anp | grep PID`：查看某进程的网络占用情况
+- `netstat -nlp | grep PORT_ID`：查看某端口的进程占用情况
+- 参数：
+  - `netstat -a`：显示所有socket（包含正在监听的和非监听的）
+  - `netstat -n`：不显示别名而显示数字（显示IP）
+  - `netstat -l`：仅列出正在监听的服务状态
+  - `netstat -p`：显示调用的进程
+
+
+
+## 其他命令
+
+- `crontab`：设置定时任务
+  - `crontab -l`：显示当前用户所有定时任务
+  - `crontab -e`：编辑定时任务
+  - `crontabl -r`：移除当前用户所有定时任务
