@@ -2254,3 +2254,53 @@ class Solution {
 ```
 
 相当于复习map的用法了，想要遍历所有元素可以使用map的entry来获取元素，很神秘；
+
+## [2373. 矩阵中的局部最大值](https://leetcode.cn/problems/largest-local-values-in-a-matrix/)
+
+给你一个大小为 `n x n` 的整数矩阵 `grid` 。
+
+生成一个大小为 `(n - 2) x (n - 2)` 的整数矩阵 `maxLocal` ，并满足：
+
+- `maxLocal[i][j]` 等于 `grid` 中以 `i + 1` 行和 `j + 1` 列为中心的 `3 x 3` 矩阵中的 **最大值** 。
+
+换句话说，我们希望找出 `grid` 中每个 `3 x 3` 矩阵中的最大值。
+
+返回生成的矩阵。
+
+```java
+class Solution {
+    public int[][] dirs = new int[][] {
+        {-1, -1}, {-1, 0}, {-1, 1},
+        {0, -1}, {0, 0}, {0, 1},
+        {1, -1}, {1, 0}, {1, 1},
+    };
+
+    public int[][] grid;
+
+    public int[][] largestLocal(int[][] grid) {
+        this.grid = grid;
+        int n = grid.length;
+        int m = n - 2;
+        int[][] res = new int[m][m];
+
+        for (int i=0; i<m; i++) {
+            for (int j=0; j<m; j++) {
+                res[i][j] = cal(i+1, j+1);
+            }
+        }
+        return res;
+    }
+
+    public int cal(int x, int y) {
+        int max = -1;
+        for (var dir:dirs) {
+            int nx = x + dir[0];
+            int ny = y + dir[1];
+            max= Math.max(max, grid[nx][ny]);
+        }
+        return max;
+    }
+}
+```
+
+朴素，把小矩阵的每个矩阵对到大矩阵每次计算的中心就行了。某种优化思想是利用滑动窗口，因为每个大矩阵的点可能都计算过很多次了。比如设定3*3的窗口，移动的时候让离开的三个格子和进来的三个格子作比较啥的。不过移动窗口过几天再复习。
